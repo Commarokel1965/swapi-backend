@@ -4,8 +4,8 @@ const router = new Router()
 
 const swapiUrl = process.env.SWAPI_URL;
 
-async function fetchAll(currentPage) {
-  const response = await axios.get(`https://${swapiUrl}/api/starships/?page=${currentPage}`);
+async function fetchAll(currentPage, searchTerm) {
+  const response = await axios.get(`https://${swapiUrl}/api/starships/?page=${currentPage}&search=${searchTerm}`);
   const starships = response.data.results.map((starship) => {
       const {
         name,
@@ -50,17 +50,12 @@ async function fetchAll(currentPage) {
 
 router.get('/api/starships', (req, res) => {
   let page = req.query.page || 1
+  const searchTerm = req.query.search;
 
-  try{
-    const data = fetchAll(page)
-        .then(values => {
-            res.json(values);
-        })
-    return data
-  } catch (error) {
-    console.error('Error fetching starships from SWAPI:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  const data = fetchAll(page, searchTerm)
+      .then(values => {
+          res.json(values);
+      })
 }) 
 
 module.exports = router
